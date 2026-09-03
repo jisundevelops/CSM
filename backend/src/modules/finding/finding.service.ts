@@ -5,6 +5,18 @@ import { auditService } from '../audit';
 import { assetService } from '../asset';
 import { riskService } from '../risk';
 
+interface CanonicalFinding {
+  asset_id: string;
+  scanner_source: string;
+  fingerprint: string;
+  title: string;
+  description: string | null;
+  severity: string;
+  confidence: string;
+  status: string;
+  raw_evidence: any;
+}
+
 export const findingService = {
   list: async (orgId: string) => {
     return findingRepository.findByOrg(orgId);
@@ -70,5 +82,59 @@ export const findingService = {
       entityType: 'Finding',
       entityId: id
     });
+  },
+
+  upsertByFingerprint: async (
+    orgId: string,
+    actorId: string,
+    data: CanonicalFinding
+  ): Promise<{ finding: any; created: boolean }> => {
+    const existing = await findingRepository.findByFingerprint(data.fingerprint, orgId);
+
+    if (existing) {
+      await findingRepository.update(existing.id, orgId, {
+        lastSeen: new Date(),
+        rawEvidence: data.raw_evidence
+      });
+
+      await auditService.log({
+        organizationId: orgId,
+        actorId,
+        action: 'UPDATE',
+        entityType: 'Finding',
+        entityId: existing.id
+      });
+
+      return { finding: existing, created: false };
+    } else {
+      const asset = await assetService.get(data.asset_id, orgId);
+      if (!asset) {
+        throw new Error('Asset not found or access denied');
+      }
+
+      const finding = await findingRepository.create(orgId, {
+        assetId: data.asset_id,
+        scannerSource: data.scanner_source,
+        fingerprint: data.fingerprint,
+        title: data.title,
+        description: data.description || undefined,
+        severity: data.severity,
+        confidence: data.confidence,
+        status: data.status,
+        rawEvidence: data.raw_evidence
+      });
+
+      await riskService.calculateAndCreate(orgId, finding.id, data.severity, asset.criticality);
+
+      await auditService.log({
+        organizationId: orgId,
+        actorId,
+        action: 'CREATE',
+        entityType: 'Finding',
+        entityId: finding.id
+      });
+
+      return { finding, created: true };
+    }
   }
 };

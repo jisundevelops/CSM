@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { apiClient } from '../api/client';
 
 interface Asset {
@@ -173,8 +174,16 @@ export const Assets: React.FC = () => {
             <tbody className="divide-y divide-gray-200">
               {assets.map(asset => (
                 <tr key={asset.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-sm capitalize">{asset.type}</td>
-                  <td className="px-4 py-3 text-sm font-mono">{asset.identifier}</td>
+                  <td className="px-4 py-3 text-sm capitalize">
+                    <Link to={`/assets/${asset.id}`} className="text-indigo-600 hover:underline font-medium">
+                      {asset.type}
+                    </Link>
+                  </td>
+                  <td className="px-4 py-3 text-sm font-mono">
+                    <Link to={`/assets/${asset.id}`} className="text-indigo-600 hover:underline">
+                      {asset.identifier}
+                    </Link>
+                  </td>
                   <td className="px-4 py-3">
                     <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${criticalityColor(asset.criticality)}`}>
                       {asset.criticality}

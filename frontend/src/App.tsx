@@ -6,6 +6,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { Layout } from './components/Layout';
 import { Dashboard } from './pages/Dashboard';
 import { Assets } from './pages/Assets';
+import { AssetDetail } from './pages/AssetDetail';
 import { Findings } from './pages/Findings';
 import { Risks } from './pages/Risks';
 import { Tasks } from './pages/Tasks';
@@ -28,6 +29,7 @@ function App() {
         >
           <Route index element={<Dashboard />} />
           <Route path="assets" element={<Assets />} />
+          <Route path="assets/:id" element={<AssetDetail />} />
           <Route path="findings" element={<Findings />} />
           <Route path="risks" element={<Risks />} />
           <Route path="tasks" element={<Tasks />} />

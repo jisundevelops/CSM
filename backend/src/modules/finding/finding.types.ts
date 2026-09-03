@@ -16,4 +16,6 @@ export interface UpdateFindingInput {
   severity?: string;
   confidence?: string;
   status?: string;
+  lastSeen?: Date;
+  rawEvidence?: any;
 }

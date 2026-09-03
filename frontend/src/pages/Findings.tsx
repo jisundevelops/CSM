@@ -10,10 +10,14 @@ interface Finding {
   confidence: string;
   status: string;
   scannerSource: string;
+  fingerprint: string;
   firstSeen: string;
   lastSeen: string;
+  rawEvidence: any;
   asset?: { id: string; identifier: string; criticality: string };
   risks?: { id: string; score: number }[];
+  evidences?: Evidence[];
+  tasks?: Task[];
 }
 
 interface Evidence {
@@ -43,6 +47,7 @@ export const Findings: React.FC = () => {
   const [selectedFinding, setSelectedFinding] = useState<Finding | null>(null);
   const [evidence, setEvidence] = useState<Evidence[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [showRawEvidence, setShowRawEvidence] = useState(false);
 
   const [assetId, setAssetId] = useState('');
   const [title, setTitle] = useState('');
@@ -88,6 +93,7 @@ export const Findings: React.FC = () => {
       setSelectedFinding(data);
       setEvidence(data.evidences || []);
       setTasks(data.tasks || []);
+      setShowRawEvidence(false);
     } catch (err: any) {
       setError(err.message);
     }
@@ -169,6 +175,17 @@ export const Findings: React.FC = () => {
       case 'reopened': return 'bg-orange-100 text-orange-800';
       case 'resolved': return 'bg-green-100 text-green-800';
       default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const sourceColor = (s: string) => {
+    switch (s.toLowerCase()) {
+      case 'manual': return 'bg-gray-100 text-gray-700';
+      case 'dns': return 'bg-blue-100 text-blue-700';
+      case 'ssl': return 'bg-green-100 text-green-700';
+      case 'http_headers': return 'bg-yellow-100 text-yellow-700';
+      case 'exposure': return 'bg-red-100 text-red-700';
+      default: return 'bg-indigo-100 text-indigo-700';
     }
   };
 
@@ -275,7 +292,11 @@ export const Findings: React.FC = () => {
                         {finding.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-500">{finding.scannerSource}</td>
+                    <td className="px-4 py-3">
+                      <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${sourceColor(finding.scannerSource)}`}>
+                        {finding.scannerSource}
+                      </span>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -289,7 +310,7 @@ export const Findings: React.FC = () => {
           <div className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold">Finding Detail</h2>
-              <button onClick={() => setSelectedFinding(null)} className="text-gray-400 hover:text-gray-600">✕</button>
+              <button onClick={() => setSelectedFinding(null)} className="text-gray-400 hover:text-gray-600">X</button>
             </div>
 
             <div className="space-y-4">
@@ -315,12 +336,53 @@ export const Findings: React.FC = () => {
                   <p className="text-lg font-bold">{selectedFinding.risks?.[0]?.score ?? '-'}</p>
                 </div>
               </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Status</p>
+                  <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${statusColor(selectedFinding.status)}`}>
+                    {selectedFinding.status}
+                  </span>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">Confidence</p>
+                  <span className="text-sm capitalize">{selectedFinding.confidence}</span>
+                </div>
+              </div>
+
               <div>
-                <p className="text-sm font-medium text-gray-500">Status</p>
-                <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${statusColor(selectedFinding.status)}`}>
-                  {selectedFinding.status}
+                <p className="text-sm font-medium text-gray-500">Scanner Source</p>
+                <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${sourceColor(selectedFinding.scannerSource)}`}>
+                  {selectedFinding.scannerSource}
                 </span>
               </div>
+
+              <div className="grid grid-cols-2 gap-3 text-xs text-gray-500">
+                <div>
+                  <p className="font-medium">First Seen</p>
+                  <p>{new Date(selectedFinding.firstSeen).toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="font-medium">Last Seen</p>
+                  <p>{new Date(selectedFinding.lastSeen).toLocaleString()}</p>
+                </div>
+              </div>
+
+              {selectedFinding.rawEvidence && (
+                <div className="border-t pt-4">
+                  <button
+                    onClick={() => setShowRawEvidence(!showRawEvidence)}
+                    className="flex items-center justify-between w-full text-sm font-medium text-gray-500 hover:text-gray-700"
+                  >
+                    <span>Raw Scanner Output</span>
+                    <span className="text-xs">{showRawEvidence ? 'Hide' : 'Show'}</span>
+                  </button>
+                  {showRawEvidence && (
+                    <pre className="mt-2 bg-gray-900 text-green-400 text-xs p-3 rounded-lg overflow-x-auto max-h-64 overflow-y-auto whitespace-pre-wrap break-all">
+                      {JSON.stringify(selectedFinding.rawEvidence, null, 2)}
+                    </pre>
+                  )}
+                </div>
+              )}
 
               <div className="border-t pt-4">
                 <div className="flex items-center justify-between mb-2">

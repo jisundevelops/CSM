@@ -25,6 +25,12 @@ export const findingRepository = {
     });
   },
 
+  findByFingerprint: async (fingerprint: string, orgId: string) => {
+    return prisma.finding.findFirst({
+      where: { fingerprint, organizationId: orgId }
+    });
+  },
+
   create: async (orgId: string, data: CreateFindingInput) => {
     return prisma.finding.create({
       data: {

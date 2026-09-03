@@ -8,6 +8,7 @@ import findingRoutes from './modules/finding/finding.routes';
 import taskRoutes from './modules/task/task.routes';
 import verificationRoutes from './modules/verification/verification.routes';
 import evidenceRoutes from './modules/evidence/evidence.routes';
+import scannerRoutes from './modules/scanner/scanner.routes';
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use('/api/findings', findingRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/verifications', verificationRoutes);
 app.use('/api/evidence', evidenceRoutes);
+app.use('/api/scanner', scannerRoutes);
 app.use('/api/audit-logs', auditRoutes);
 
 export default app;
