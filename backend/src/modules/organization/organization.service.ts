@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+﻿import bcrypt from 'bcryptjs';
 import { organizationRepository } from './organization.repository';
 import { AddMemberInput } from './organization.types';
 import { auditService } from '../audit';
