@@ -190,13 +190,13 @@ export const Findings: React.FC = () => {
   };
 
   return (
-    <div className="flex h-full">
-      <div className="flex-1">
-        <div className="flex items-center justify-between mb-6">
+    <div className="flex h-full relative">
+      <div className="flex-1 min-w-0">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
           <h1 className="text-2xl font-bold">Findings</h1>
           <button
             onClick={() => setShowCreateForm(true)}
-            className="rounded-md bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700"
+            className="w-full sm:w-auto rounded-md bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700"
           >
             + Add Finding
           </button>
@@ -205,8 +205,8 @@ export const Findings: React.FC = () => {
         {error && <p className="mb-4 text-red-500">{error}</p>}
 
         {showCreateForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <form onSubmit={handleCreateFinding} className="bg-white rounded-lg p-6 w-full max-w-md space-y-4">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <form onSubmit={handleCreateFinding} className="bg-white rounded-lg p-6 w-full max-w-md space-y-4 max-h-[90vh] overflow-y-auto">
               <h2 className="text-lg font-bold">Create Finding</h2>
               <div>
                 <label className="block text-sm font-medium mb-1">Asset</label>
@@ -225,7 +225,7 @@ export const Findings: React.FC = () => {
                 <label className="block text-sm font-medium mb-1">Description</label>
                 <textarea value={description} onChange={e => setDescription(e.target.value)} className="w-full border rounded-md p-2" rows={3} />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm font-medium mb-1">Severity</label>
                   <select value={severity} onChange={e => setSeverity(e.target.value)} className="w-full border rounded-md p-2">
@@ -258,59 +258,61 @@ export const Findings: React.FC = () => {
         ) : findings.length === 0 ? (
           <p className="text-gray-500">No findings yet. Click "+ Add Finding" to create one.</p>
         ) : (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Asset</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Severity</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Risk Score</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Source</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {findings.map(finding => (
-                  <tr
-                    key={finding.id}
-                    className="hover:bg-gray-50 cursor-pointer"
-                    onClick={() => fetchFindingDetail(finding.id)}
-                  >
-                    <td className="px-4 py-3 text-sm font-medium">{finding.title}</td>
-                    <td className="px-4 py-3 text-sm">{finding.asset?.identifier || '-'}</td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${severityColor(finding.severity)}`}>
-                        {finding.severity}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm font-bold">
-                      {finding.risks?.[0]?.score ?? '-'}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${statusColor(finding.status)}`}>
-                        {finding.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${sourceColor(finding.scannerSource)}`}>
-                        {finding.scannerSource}
-                      </span>
-                    </td>
+          <div className="bg-white rounded-lg shadow">
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[720px]">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Asset</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Severity</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Risk Score</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Source</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {findings.map(finding => (
+                    <tr
+                      key={finding.id}
+                      className="hover:bg-gray-50 cursor-pointer"
+                      onClick={() => fetchFindingDetail(finding.id)}
+                    >
+                      <td className="px-4 py-3 text-sm font-medium">{finding.title}</td>
+                      <td className="px-4 py-3 text-sm">{finding.asset?.identifier || '-'}</td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${severityColor(finding.severity)}`}>
+                          {finding.severity}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm font-bold">
+                        {finding.risks?.[0]?.score ?? '-'}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${statusColor(finding.status)}`}>
+                          {finding.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${sourceColor(finding.scannerSource)}`}>
+                          {finding.scannerSource}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>
 
       {selectedFinding && (
-        <div className="w-96 bg-white border-l border-gray-200 overflow-y-auto">
+        <div className="fixed inset-0 z-50 md:static md:inset-auto md:z-auto md:w-96 bg-white md:border-l border-gray-200 overflow-y-auto">
           <div className="p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold">Finding Detail</h2>
-              <button onClick={() => setSelectedFinding(null)} className="text-gray-400 hover:text-gray-600">X</button>
+              <button onClick={() => setSelectedFinding(null)} className="text-gray-400 hover:text-gray-600 text-lg px-2">X</button>
             </div>
 
             <div className="space-y-4">

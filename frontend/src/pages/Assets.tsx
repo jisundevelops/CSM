@@ -96,11 +96,11 @@ export const Assets: React.FC = () => {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <h1 className="text-2xl font-bold">Assets</h1>
         <button
           onClick={openCreateForm}
-          className="rounded-md bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700"
+          className="w-full sm:w-auto rounded-md bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700"
         >
           + Add Asset
         </button>
@@ -109,8 +109,8 @@ export const Assets: React.FC = () => {
       {error && <p className="mb-4 text-red-500">{error}</p>}
 
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <form onSubmit={handleSubmit} className="bg-white rounded-lg p-6 w-full max-w-md space-y-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <form onSubmit={handleSubmit} className="bg-white rounded-lg p-6 w-full max-w-md space-y-4 max-h-[90vh] overflow-y-auto">
             <h2 className="text-lg font-bold">{editingAsset ? 'Edit Asset' : 'Create Asset'}</h2>
             <div>
               <label className="block text-sm font-medium mb-1">Type</label>
@@ -159,48 +159,50 @@ export const Assets: React.FC = () => {
       ) : assets.length === 0 ? (
         <p className="text-gray-500">No assets yet. Click "+ Add Asset" to create one.</p>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Identifier</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Criticality</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Findings</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {assets.map(asset => (
-                <tr key={asset.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-sm capitalize">
-                    <Link to={`/assets/${asset.id}`} className="text-indigo-600 hover:underline font-medium">
-                      {asset.type}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 text-sm font-mono">
-                    <Link to={`/assets/${asset.id}`} className="text-indigo-600 hover:underline">
-                      {asset.identifier}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${criticalityColor(asset.criticality)}`}>
-                      {asset.criticality}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-sm">{asset._count?.findings ?? 0}</td>
-                  <td className="px-4 py-3 text-sm text-gray-500">
-                    {new Date(asset.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-3 text-sm space-x-2">
-                    <button onClick={() => openEditForm(asset)} className="text-indigo-600 hover:underline">Edit</button>
-                    <button onClick={() => handleDelete(asset.id)} className="text-red-600 hover:underline">Delete</button>
-                  </td>
+        <div className="bg-white rounded-lg shadow">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[640px]">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Identifier</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Criticality</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Findings</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {assets.map(asset => (
+                  <tr key={asset.id} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 text-sm capitalize">
+                      <Link to={`/assets/${asset.id}`} className="text-indigo-600 hover:underline font-medium">
+                        {asset.type}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3 text-sm font-mono">
+                      <Link to={`/assets/${asset.id}`} className="text-indigo-600 hover:underline">
+                        {asset.identifier}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${criticalityColor(asset.criticality)}`}>
+                        {asset.criticality}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-sm">{asset._count?.findings ?? 0}</td>
+                    <td className="px-4 py-3 text-sm text-gray-500">
+                      {new Date(asset.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-4 py-3 text-sm space-x-2 whitespace-nowrap">
+                      <button onClick={() => openEditForm(asset)} className="text-indigo-600 hover:underline">Edit</button>
+                      <button onClick={() => handleDelete(asset.id)} className="text-red-600 hover:underline">Delete</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>
